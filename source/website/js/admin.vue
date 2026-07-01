@@ -66,10 +66,10 @@ v-app
 </template>
 <script>
 
-require('vuex');
-const _ = require('lodash');
+import 'vuex';
+import _ from 'lodash';
 
-module.exports = {
+export default {
     data: () => ({
         drawer: null,
         open: ["QnaHelp"],

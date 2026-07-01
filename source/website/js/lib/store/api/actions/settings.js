@@ -2,12 +2,12 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const _ = require('lodash');
-const { DynamoDBClient, DeleteItemCommand, GetItemCommand, PutItemCommand, ScanCommand, UpdateItemCommand } = require('@aws-sdk/client-dynamodb');
-const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
-const { LambdaClient, InvokeCommand } = require('@aws-sdk/client-lambda');
-const util = require('../../../../capability/util');
-const defaultSettings = require('../../../../../../../source/lambda/cfn/lib/DefaultSettings.json');
+import _ from 'lodash';
+import { DynamoDBClient, DeleteItemCommand, GetItemCommand, PutItemCommand, ScanCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import util from '../../../../capability/util.js';
+import defaultSettings from '../../../../../../../source/lambda/cfn/lib/DefaultSettings.json' with { type: 'json' };
 
 const EMPTY_SENTINEL = 'EMPTY_STRING_BY_USER';
 
@@ -882,7 +882,7 @@ async function sendAnonymizedData(params, settings){
     return response;
 }
 
-module.exports = {
+export default {
     async listSettings(context) {
         const credentials = context.rootState.user.credentials;
         

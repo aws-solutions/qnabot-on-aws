@@ -3,13 +3,19 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const validator = new (require('jsonschema').Validator)();
-const axios = require('axios');
-const util = require('./util');
+import { Validator } from 'jsonschema';
+import axios from 'axios';
+import util from './util';
+import get from './get.js';
+import deleteActions from './delete.js';
+import upDownload from './up-download.js';
+import add from './add.js';
 
-module.exports = Object.assign(
-    require('./get'),
-    require('./delete'),
-    require('./up-download'),
-    require('./add'),
+const validator = new Validator();
+
+export default Object.assign(
+    get,
+    deleteActions,
+    upDownload,
+    add,
 );

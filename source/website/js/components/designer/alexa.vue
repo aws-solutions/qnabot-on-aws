@@ -11,9 +11,9 @@ v-dialog(
 )
   template(#activator="{ props }")
     v-btn(
+      v-bind="props"
       block
       variant="text"
-      v-bind="props"
     ) Alexa Update
   v-card(id="alexa-modal")
     v-card-title
@@ -45,11 +45,10 @@ v-dialog(
 </template>
 
 <script>
+import Vuex from 'vuex';
+import _ from 'lodash';
 
-const Vuex = require('vuex');
-const _ = require('lodash');
-
-module.exports = {
+export default {
     data() {
         return {
             dialog: false,

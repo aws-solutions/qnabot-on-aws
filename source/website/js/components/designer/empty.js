@@ -20,4 +20,5 @@ function empty(input) {
         return out;
     }
 }
-module.exports = empty;
+export default empty;
+

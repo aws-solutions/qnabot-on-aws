@@ -2,6 +2,8 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { vi } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import importModule from '../../js/components/import.vue';
 import { shallowMount } from '@vue/test-utils';
 
@@ -22,11 +24,11 @@ describe('import component', () => {
     };
 
     beforeEach(() => {
-        jest.resetAllMocks();
-        consoleLogSpy = jest.spyOn(console, "log")
-        consoleLogSpy.mockImplementation(jest.fn());
+        vi.resetAllMocks();
+        consoleLogSpy = vi.spyOn(console, "log")
+        consoleLogSpy.mockImplementation(vi.fn());
         store = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
         };
     });
 

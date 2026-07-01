@@ -2,13 +2,15 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { vi } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import indexModule from '../../../js/components/genesys/index.vue';
 import { shallowMount } from '@vue/test-utils';
 
 describe('genesys component index', () => {
     test('mounted', () => {
         const store = {
-            dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+            dispatch: vi.fn().mockImplementation(() => Promise.resolve({})),
         };
         const wrapper = shallowMount(indexModule, {
             global: {
@@ -21,10 +23,10 @@ describe('genesys component index', () => {
     });
 
     test('copy method', async () => {
-        global.URL.createObjectURL = jest.fn();
-        global.URL.revokeObjectURL = jest.fn();
+        global.URL.createObjectURL = vi.fn();
+        global.URL.revokeObjectURL = vi.fn();
         const store = {
-            dispatch: jest.fn().mockImplementation(() => Promise.resolve('test')),
+            dispatch: vi.fn().mockImplementation(() => Promise.resolve('test')),
         };
         const wrapper = shallowMount(indexModule, {
             global: {

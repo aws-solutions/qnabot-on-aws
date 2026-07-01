@@ -2,13 +2,15 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { vi } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import editModule from '../../../js/components/designer/edit.vue';
 import { shallowMount } from '@vue/test-utils';
 
 describe('designer edit module', () => {
 
     beforeEach(() => {
-        jest.spyOn(console, 'log').mockImplementation(jest.fn());
+        vi.spyOn(console, 'log').mockImplementation(vi.fn());
     });
 
     const shallowMountWithTmpData = () => {
@@ -32,7 +34,7 @@ describe('designer edit module', () => {
                     },
                 },
             },
-            dispatch: jest.fn().mockReturnValue(false),
+            dispatch: vi.fn().mockReturnValue(false),
         };
 
         const wrapper = shallowMount(editModule, {
@@ -50,7 +52,28 @@ describe('designer edit module', () => {
     };
 
     test('mounted', () => {
-        const wrapper = shallowMount(editModule);
+        const store = {
+            state: {
+                data: {
+                    schema: {
+                        qna: {},
+                    },
+                },
+            },
+        };
+        const wrapper = shallowMount(editModule, {
+            props: {
+                data: {
+                    type: 'qna',
+                    qid: 'test-qid',
+                },
+            },
+            global: {
+                mocks: {
+                    $store: store,
+                }
+            }
+        });
         expect(wrapper.exists()).toBe(true);
     });
 
@@ -119,7 +142,28 @@ describe('designer edit module', () => {
     });
 
     test('cancel', () => {
-        const wrapper = shallowMount(editModule);
+        const store = {
+            state: {
+                data: {
+                    schema: {
+                        qna: {},
+                    },
+                },
+            },
+        };
+        const wrapper = shallowMount(editModule, {
+            props: {
+                data: {
+                    type: 'qna',
+                    qid: 'test-qid',
+                },
+            },
+            global: {
+                mocks: {
+                    $store: store,
+                }
+            }
+        });
         wrapper.vm.$data.dialog = true;
         wrapper.vm.$data.opened = true;
         wrapper.vm.$data.error = 'Some error';
@@ -183,7 +227,28 @@ describe('designer edit module', () => {
     });
 
     test('close', () => {
-        const wrapper = shallowMount(editModule);
+        const store = {
+            state: {
+                data: {
+                    schema: {
+                        qna: {},
+                    },
+                },
+            },
+        };
+        const wrapper = shallowMount(editModule, {
+            props: {
+                data: {
+                    type: 'qna',
+                    qid: 'test-qid',
+                },
+            },
+            global: {
+                mocks: {
+                    $store: store,
+                }
+            }
+        });
         wrapper.vm.close();
         expect(wrapper.emitted('filter')).toBeTruthy();
     });
@@ -267,7 +332,7 @@ describe('designer edit module', () => {
                     quniqueterms: 'some-test-terms',
                 },
             },
-            dispatch: jest.fn().mockReturnValue(false),
+            dispatch: vi.fn().mockReturnValue(false),
         };
 
         const wrapper = shallowMount(editModule, {
@@ -329,7 +394,7 @@ describe('designer edit module', () => {
                         },
                     },
                 },
-                dispatch: jest.fn().mockReturnValue(false),
+                dispatch: vi.fn().mockReturnValue(false),
             };
 
             const wrapper = shallowMount(editModule, {
@@ -379,7 +444,7 @@ describe('designer edit module', () => {
                         },
                     },
                 },
-                dispatch: jest.fn().mockReturnValue(false),
+                dispatch: vi.fn().mockReturnValue(false),
             };
 
             const wrapper = shallowMount(editModule, {
@@ -432,7 +497,7 @@ describe('designer edit module', () => {
                         },
                     },
                 },
-                dispatch: jest.fn().mockReturnValue(false),
+                dispatch: vi.fn().mockReturnValue(false),
             };
 
             const wrapper = shallowMount(editModule, {
@@ -482,7 +547,7 @@ describe('designer edit module', () => {
                         },
                     },
                 },
-                dispatch: jest.fn().mockReturnValue(false),
+                dispatch: vi.fn().mockReturnValue(false),
             };
 
             const wrapper = shallowMount(editModule, {
@@ -521,7 +586,7 @@ describe('designer edit module', () => {
                 } } } },
                 tmp: { quniqueterms: 'test' },
             },
-            dispatch: jest.fn().mockReturnValue(false),
+            dispatch: vi.fn().mockReturnValue(false),
         });
 
         async function testMarkdown(input, expected) {

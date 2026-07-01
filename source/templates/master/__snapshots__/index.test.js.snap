@@ -12,6 +12,906 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "TRUE",
       ],
     },
+    "AlexaSkill0Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                0,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill10Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                10,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill11Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                11,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill12Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                12,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill13Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                13,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill14Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                14,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill15Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                15,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill16Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                16,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill17Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                17,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill18Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                18,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill19Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                19,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill1Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                1,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill20Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                20,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill21Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                21,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill22Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                22,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill23Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                23,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill24Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                24,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill25Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                25,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill26Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                26,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill27Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                27,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill28Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                28,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill29Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                29,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill2Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                2,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill3Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                3,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill4Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                4,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill5Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                5,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill6Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                6,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill7Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                7,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill8Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                8,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
+    "AlexaSkill9Enabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Fn::Select": [
+                9,
+                {
+                  "Fn::Split": [
+                    ",",
+                    {
+                      "Fn::Join": [
+                        ",",
+                        [
+                          {
+                            "Ref": "AlexaSkillIds",
+                          },
+                          ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            "",
+          ],
+        },
+      ],
+    },
     "BedrockEnable": {
       "Fn::Or": [
         {
@@ -433,6 +1333,14 @@ exports[`Verify master template is correct renders master template correctly 1`]
             "LogRetentionPeriod",
           ],
         },
+        {
+          "Label": {
+            "default": "Step 2G: Set Alexa integration parameters (optional)",
+          },
+          "Parameters": [
+            "AlexaSkillIds",
+          ],
+        },
       ],
     },
   },
@@ -743,6 +1651,13 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "ConstraintDescription": "Allowed Values are FALSE or TRUE",
       "Default": "TRUE",
       "Description": "Set to TRUE if only the administrator is allowed to create user profiles in Amazon Cognito",
+      "Type": "String",
+    },
+    "AlexaSkillIds": {
+      "AllowedPattern": "(^$|^amzn1\\.ask\\.skill\\.[a-zA-Z0-9-]+(,amzn1\\.ask\\.skill\\.[a-zA-Z0-9-]+){0,29}$)",
+      "ConstraintDescription": "Comma-separated list of up to 30 Alexa Skill IDs with no spaces (e.g. amzn1.ask.skill.xxx,amzn1.ask.skill.yyy), or blank to disable.",
+      "Default": "",
+      "Description": "Comma-separated list of up to 30 Alexa Skill IDs. Leave blank to disable Alexa integration. To find your Skill ID: open the Alexa Developer Console, select your skill, and copy the Skill ID shown on the main page (e.g. amzn1.ask.skill.xxx-xxx-xxx,amzn1.ask.skill.yyy-yyy-yyy).",
       "Type": "String",
     },
     "AltSearchKendraIndexAuth": {
@@ -1301,10 +2216,1308 @@ exports[`Verify master template is correct renders master template correctly 1`]
       },
       "Type": "AWS::Cognito::UserPoolGroup",
     },
-    "Alexa": {
+    "Alexa0": {
+      "Condition": "AlexaSkill0Enabled",
       "DependsOn": "FulfillmentLambdaAliaslive",
       "Properties": {
         "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa1": {
+      "Condition": "AlexaSkill1Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa10": {
+      "Condition": "AlexaSkill10Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            10,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa11": {
+      "Condition": "AlexaSkill11Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            11,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa12": {
+      "Condition": "AlexaSkill12Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            12,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa13": {
+      "Condition": "AlexaSkill13Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            13,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa14": {
+      "Condition": "AlexaSkill14Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            14,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa15": {
+      "Condition": "AlexaSkill15Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            15,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa16": {
+      "Condition": "AlexaSkill16Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            16,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa17": {
+      "Condition": "AlexaSkill17Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            17,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa18": {
+      "Condition": "AlexaSkill18Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            18,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa19": {
+      "Condition": "AlexaSkill19Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            19,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa2": {
+      "Condition": "AlexaSkill2Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            2,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa20": {
+      "Condition": "AlexaSkill20Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            20,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa21": {
+      "Condition": "AlexaSkill21Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            21,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa22": {
+      "Condition": "AlexaSkill22Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            22,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa23": {
+      "Condition": "AlexaSkill23Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            23,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa24": {
+      "Condition": "AlexaSkill24Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            24,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa25": {
+      "Condition": "AlexaSkill25Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            25,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa26": {
+      "Condition": "AlexaSkill26Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            26,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa27": {
+      "Condition": "AlexaSkill27Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            27,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa28": {
+      "Condition": "AlexaSkill28Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            28,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa29": {
+      "Condition": "AlexaSkill29Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            29,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa3": {
+      "Condition": "AlexaSkill3Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            3,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa4": {
+      "Condition": "AlexaSkill4Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            4,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa5": {
+      "Condition": "AlexaSkill5Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            5,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa6": {
+      "Condition": "AlexaSkill6Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            6,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa7": {
+      "Condition": "AlexaSkill7Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            7,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa8": {
+      "Condition": "AlexaSkill8Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            8,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Fn::GetAtt": [
+                  "FulfillmentLambda",
+                  "Arn",
+                ],
+              },
+              "live",
+            ],
+          ],
+        },
+        "Principal": "alexa-appkit.amazon.com",
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "Alexa9": {
+      "Condition": "AlexaSkill9Enabled",
+      "DependsOn": "FulfillmentLambdaAliaslive",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "EventSourceToken": {
+          "Fn::Select": [
+            9,
+            {
+              "Fn::Split": [
+                ",",
+                {
+                  "Fn::Join": [
+                    ",",
+                    [
+                      {
+                        "Ref": "AlexaSkillIds",
+                      },
+                      ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
         "FunctionName": {
           "Fn::Join": [
             ":",
@@ -9816,7 +12029,7 @@ exports.documents = async (event, context) => {
                 {
                   "Ref": "Bucket",
                 },
-                "/assets/{proxy}",
+                "/images/{proxy}",
               ],
             ],
           },
@@ -10361,8 +12574,12 @@ exports.documents = async (event, context) => {
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    "arn:aws:lambda:*:*:function:qna-*",
-                    "arn:aws:lambda:*:*:function:QNA-*",
+                    {
+                      "Fn::Sub": "arn:\${AWS::Partition}:lambda:\${AWS::Region}:\${AWS::AccountId}:function:qna-*",
+                    },
+                    {
+                      "Fn::Sub": "arn:\${AWS::Partition}:lambda:\${AWS::Region}:\${AWS::AccountId}:function:QNA-*",
+                    },
                     {
                       "Fn::GetAtt": [
                         "ESQueryLambda",
@@ -10488,8 +12705,12 @@ exports.documents = async (event, context) => {
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    "arn:aws:lambda:*:*:function:qna-*",
-                    "arn:aws:lambda:*:*:function:QNA-*",
+                    {
+                      "Fn::Sub": "arn:\${AWS::Partition}:lambda:\${AWS::Region}:\${AWS::AccountId}:function:qna-*",
+                    },
+                    {
+                      "Fn::Sub": "arn:\${AWS::Partition}:lambda:\${AWS::Region}:\${AWS::AccountId}:function:QNA-*",
+                    },
                     {
                       "Fn::GetAtt": [
                         "ESQueryLambda",
@@ -15286,8 +17507,12 @@ exports.handler = async (event, context) => {
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    "arn:aws:lambda:*:*:function:qna*",
-                    "arn:aws:lambda:*:*:function:QNA*",
+                    {
+                      "Fn::Sub": "arn:\${AWS::Partition}:lambda:\${AWS::Region}:\${AWS::AccountId}:function:qna*",
+                    },
+                    {
+                      "Fn::Sub": "arn:\${AWS::Partition}:lambda:\${AWS::Region}:\${AWS::AccountId}:function:QNA*",
+                    },
                     {
                       "Fn::GetAtt": [
                         "ExamplesStack",
@@ -15367,8 +17592,12 @@ exports.handler = async (event, context) => {
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    "arn:aws:lambda:*:*:function:qna*",
-                    "arn:aws:lambda:*:*:function:QNA*",
+                    {
+                      "Fn::Sub": "arn:\${AWS::Partition}:lambda:\${AWS::Region}:\${AWS::AccountId}:function:qna*",
+                    },
+                    {
+                      "Fn::Sub": "arn:\${AWS::Partition}:lambda:\${AWS::Region}:\${AWS::AccountId}:function:QNA*",
+                    },
                   ],
                 },
               ],

@@ -2,17 +2,18 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { describe, test, expect, beforeEach, vi } from 'vitest';
 import indexComponent from '../../../js/components/hooks/index.vue';
 import { shallowMount } from '@vue/test-utils';
 
-const handlebars = require('handlebars');
+import handlebars from 'handlebars';
 
-jest.mock('handlebars');
+vi.mock('handlebars');
 
-// We are mocking the following files this way to prevent jest from
+// We are mocking the following files this way to prevent vitest from
 // attempting to read the file contents.
-jest.mock('../../../js/components/hooks/codepy.txt', () => jest.fn());
-jest.mock('../../../js/components/hooks/codejs.txt', () => jest.fn());
+vi.mock('../../../js/components/hooks/codepy.txt', () => ({ default: '' }));
+vi.mock('../../../js/components/hooks/codejs.txt', () => ({ default: '' }));
 
 describe('index hook component', () => {
     const store = {
@@ -22,11 +23,11 @@ describe('index hook component', () => {
     };
 
     beforeEach(() => {
-        jest.resetAllMocks();
+        vi.resetAllMocks();
     });
 
     test('should render', () => {
-        handlebars.compile.mockReturnValue(jest.fn().mockImplementation(() => 'a = b + c'));
+        handlebars.compile.mockReturnValue(vi.fn().mockImplementation(() => 'a = b + c'));
         const wrapper = shallowMount(indexComponent, {
             global: {
                 mocks: {

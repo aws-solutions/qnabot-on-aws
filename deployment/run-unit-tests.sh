@@ -126,11 +126,23 @@ run_website_tests() {
 	cd $source_dir
 	npm run test:website
 
-    [ "${CLEAN:-true}" = "true" ] && rm -rf coverage/lcov-report
-	mkdir -p $source_dir/test/coverage-reports/jest/website
+    # Vitest is configured to output coverage directly to the correct location
+    # via reportsDirectory in vitest.config.mjs, so no need to move files
 	coverage_report_path=$source_dir/test/coverage-reports/jest/website
-    rm -fr $coverage_report_path
-    mv coverage $coverage_report_path
+    
+    # Fix paths in lcov.info for SonarQube (make them relative to project root)
+    if [ -f "$coverage_report_path/lcov.info" ]; then
+        # Use different sed syntax for Linux vs macOS
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            sed -i.bak "s|^SF:|SF:source/website/|g" "$coverage_report_path/lcov.info"
+            rm -f "$coverage_report_path/lcov.info.bak"
+        else
+            sed -i "s|^SF:|SF:source/website/|g" "$coverage_report_path/lcov.info"
+        fi
+        echo "Fixed paths in lcov.info for SonarQube"
+    else
+        echo "WARNING: lcov.info not found at $coverage_report_path/lcov.info"
+    fi
 }
 
 # Save the current working directory and set source directory

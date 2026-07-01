@@ -5,10 +5,10 @@
 
 // Mirrors source/lambda/es-proxy-layer/lib/sanitizeOutput.js
 // To add custom tags or attributes, update BOTH this file and the Lambda version.
-const sanitizeHtml = require('sanitize-html');
+import sanitizeHtml from 'sanitize-html';
 
 // Sanitize outputs to prevent malicious attacks
-function sanitize(data) {
+export function sanitize(data) {
     const sanitizeParams = {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat(['question', 'references', 'chatHistory', 'followUpMessage', 'details', 'summary', 'img']),
         allowedAttributes: { ...sanitizeHtml.defaults.allowedAttributes, a: ['href'], p: ['style'], span: ['translate'] },
@@ -22,5 +22,3 @@ function sanitize(data) {
     };
     return sanitizeHtml(data, sanitizeParams);
 }
-
-module.exports = { sanitize };

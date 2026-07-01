@@ -3,10 +3,7 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-/**
- * @jest-environment jsdom
- */
-
+import { describe, test, expect, beforeEach, vi } from 'vitest';
 import customTranslateModule from '../../js/components/customTranslate.vue'
 import { shallowMount } from '@vue/test-utils'
 
@@ -33,7 +30,7 @@ describe('customTranslate component', () => {
 
     const shallowMountWithDefaults = () => {
         const store = {
-            dispatch: jest.fn().mockImplementation((dispatchType) => dispatchMock(dispatchType)),
+            dispatch: vi.fn().mockImplementation((dispatchType) => dispatchMock(dispatchType)),
         };
 
         const wrapper = shallowMount(customTranslateModule, {
@@ -48,8 +45,8 @@ describe('customTranslate component', () => {
     };
 
     beforeEach(() => {
-        jest.resetAllMocks();
-        jest.spyOn(console, "log").mockImplementation(jest.fn());
+        vi.resetAllMocks();
+        vi.spyOn(console, "log").mockImplementation(vi.fn());
     });
 
     test('should mount', async () => {

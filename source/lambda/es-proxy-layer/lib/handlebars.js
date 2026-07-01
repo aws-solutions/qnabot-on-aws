@@ -143,9 +143,23 @@ Handlebars.registerHelper('resetLang', (msg, options) => {
     return msg;
 });
 
+// Safe property getter — uses _.toPath() for path parsing while blocking prototype traversal
+function safeGet(obj, path, def) {
+    const parts = _.toPath(path);
+    let current = obj;
+    for (const part of parts) {
+        if (current == null) return def;
+        if (!Object.hasOwn(Object(current), part)) return def;
+        current = current[part];
+    }
+    return current === undefined ? def : current;
+}
+
 Handlebars.registerHelper('setSessionAttr', function () {
     const args = Array.from(arguments);
     const k = args[0];
+    const blocked = new Set(['__proto__', 'constructor', 'prototype']);
+    if (_.toPath(k).some(p => blocked.has(p))) return undefined;
     // concat remaining arguments to create value
     const v_arr = args.slice(1, args.length - 1); // ignore final 'options' argument
     const v = v_arr.join(''); // concatenate value arguments
@@ -161,13 +175,13 @@ Handlebars.registerHelper('getQuestion', () => {
 });
 
 Handlebars.registerHelper('getSessionAttr', (attr, def, options) => {
-    const v = _.get(res_glbl.session, attr, def);
+    const v = safeGet(res_glbl.session, attr, def);
     qnabot.log('Return session attribute key, value: ', attr, v);
     return v;
 });
 
 Handlebars.registerHelper('getSlot', (slotname, def, options) => {
-    const v = _.get(req_glbl.slots, slotname, def);
+    const v = safeGet(req_glbl.slots, slotname, def);
     qnabot.log('Return slot key, value: ', slotname, v);
     return v;
 });

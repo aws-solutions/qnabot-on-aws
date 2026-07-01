@@ -3,15 +3,15 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const { fromCognitoIdentityPool } = require('@aws-sdk/credential-providers');
-const { CognitoIdentityClient, GetIdCommand, GetCredentialsForIdentityCommand } = require('@aws-sdk/client-cognito-identity');
-const { LexRuntimeServiceClient } = require('@aws-sdk/client-lex-runtime-service');
-const { LexRuntimeV2Client } = require('@aws-sdk/client-lex-runtime-v2');
-const { PollyClient } = require('@aws-sdk/client-polly');
-const axios = require('axios');
-const _ = require('lodash');
-const query = require('query-string');
-const jwt = require('jsonwebtoken');
+import { fromCognitoIdentityPool } from '@aws-sdk/credential-providers';
+import { CognitoIdentityClient, GetIdCommand, GetCredentialsForIdentityCommand } from '@aws-sdk/client-cognito-identity';
+import { LexRuntimeServiceClient } from '@aws-sdk/client-lex-runtime-service';
+import { LexRuntimeV2Client } from '@aws-sdk/client-lex-runtime-v2';
+import { PollyClient } from '@aws-sdk/client-polly';
+import axios from 'axios';
+import _ from 'lodash';
+import query from 'query-string';
+import jwt from 'jsonwebtoken';
 
 async function axiosPost(axiosMethod, axiosClient, axiosData) {
     const tokens = await axios({
@@ -112,7 +112,8 @@ async function getCredentials(region, poolId, login = {}) {
     return credentials;
 }
 
-module.exports = async function () {
+export default async function () {
+    // Get stage from api-stage header in HTML response
     const result = await axios.head(window.location.href);
     const stage = result.headers['api-stage'];
     const response = await axios.get(`/${stage}`);

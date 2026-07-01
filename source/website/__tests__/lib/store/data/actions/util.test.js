@@ -2,12 +2,13 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const util = require('../../../../../js/lib/store/data/actions/util');
+import { vi } from 'vitest';
+import util from '../../../../../js/lib/store/data/actions/util';
 
 describe('util data action', () => {
     const mockedContext = {
-        dispatch: jest.fn(),
-        commit: jest.fn(),
+        dispatch: vi.fn(),
+        commit: vi.fn(),
         handle: util.handle,
         load: util.load,
         state: {
@@ -32,8 +33,8 @@ describe('util data action', () => {
     };
 
     beforeEach(() => {
-        jest.resetAllMocks();
-        jest.spyOn(console, 'log').mockImplementation(jest.fn());
+        vi.resetAllMocks();
+        vi.spyOn(console, 'log').mockImplementation(vi.fn());
     });
 
     test('dispatch', () => {
@@ -63,10 +64,10 @@ describe('util data action', () => {
         expect(result).toEqual(expectedItem);
     });
 
-    test('handle', () => {
+    test('handle', async () => {
         const testReason = 'test error';
         const handleFunction = mockedContext.handle(testReason);
-        expect(handleFunction('some error')).rejects.toEqual(testReason);
+        await expect(handleFunction('some error')).rejects.toEqual(testReason);
         expect(mockedContext.commit).toHaveBeenCalledTimes(1);
         expect(mockedContext.commit).toHaveBeenCalledWith('setError', testReason, { root: true });
     });
@@ -77,7 +78,7 @@ describe('util data action', () => {
             'item 1',
             'item 2',
         ];
-        jest.spyOn(Promise, 'resolve').mockResolvedValueOnce({});
+        vi.spyOn(Promise, 'resolve').mockResolvedValueOnce({});
         await expect(mockedContext.load(inputList)).rejects.toEqual(expectedError);
     });
 });

@@ -3,7 +3,7 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-module.exports = {
+export default {
     selected(state) {
         return state.QAs.map((qa) => qa.select);
     },

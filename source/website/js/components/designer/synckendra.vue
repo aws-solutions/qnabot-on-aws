@@ -10,10 +10,10 @@ span(class="wrapper")
     )
       template(#activator="{ props }")
         v-btn(
+          v-bind="props"
           id="kendra-sync"
           :disabled="!(kendraFaqEnabled && !loading)"
           block
-          v-bind="props"
           variant="text"
           @click="start"
           ) Sync Kendra FAQ
@@ -39,11 +39,14 @@ span(class="wrapper")
 </template>
 
 <script>
+import _ from 'lodash';
+import 'vuex';
 
-require('vuex');
-const _ = require('lodash');
 
-module.exports = {
+
+
+
+export default {
     data() {
         return {
             snackbar: false,

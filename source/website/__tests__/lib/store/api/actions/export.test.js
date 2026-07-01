@@ -2,30 +2,94 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { vi, beforeEach, describe, test, expect } from 'vitest';
 import mockedContext from './mockedContext';
 
-const exportModule = require('../../../../../js/lib/store/api/actions/export');
-const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
-const { mockClient } = require('aws-sdk-client-mock');
+import exportModule from '../../../../../js/lib/store/api/actions/export';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb';
+import { mockClient } from 'aws-sdk-client-mock';
 
 const s3ClientMock = mockClient(S3Client);
+const dynamoDBClientMock = mockClient(DynamoDBClient);
 
 describe('export action test', () => {
     const mockedInfo = {
         _links: {
             exports: {
-                href: '',
+                href: 'https://example.com/exports',
             },
             imports: {
-                href: '',
+                href: 'https://example.com/imports',
+            },
+            jobs: {
+                href: 'https://example.com/jobs',
             },
         },
     };
 
     beforeEach(() => {
-        jest.resetAllMocks();
+        vi.resetAllMocks();
         s3ClientMock.reset();
-        jest.spyOn(console, 'log').mockImplementation(jest.fn());
+        dynamoDBClientMock.reset();
+        vi.spyOn(console, 'log').mockImplementation(vi.fn());
+        vi.spyOn(console, 'error').mockImplementation(vi.fn());
+    });
+
+    test('startExport with filter and encryption', async () => {
+        const opts = {
+            name: 'test-export',
+            filter: 'test-filter',
+        };
+
+        const mockSettings = [
+            {}, // default_settings
+            {}, // custom_settings
+            { S3_PUT_REQUEST_ENCRYPTION: 'AES256' } // merged_settings
+        ];
+
+        dynamoDBClientMock.on(ScanCommand).resolves({
+            Items: [
+                {
+                    SettingName: { S: 'S3_PUT_REQUEST_ENCRYPTION' },
+                    SettingValue: { S: 'AES256' },
+                    DefaultValue: { S: '' },
+                    SettingCategory: { S: 'Custom' }
+                }
+            ]
+        });
+
+        mockedContext.dispatch.mockReturnValueOnce(mockedInfo);
+        mockedContext.dispatch.mockReturnValueOnce({});
+
+        await exportModule.startExport(mockedContext, opts);
+
+        expect(mockedContext.dispatch).toHaveBeenCalledWith('_request', expect.objectContaining({
+            url: `${mockedInfo._links.exports.href}/${opts.name}`,
+            method: 'put',
+            body: { filter: `${opts.filter}.*`, prefix: '' }
+        }));
+    });
+
+    test('startExport without filter', async () => {
+        const opts = {
+            name: 'test-export',
+        };
+
+        dynamoDBClientMock.on(ScanCommand).resolves({
+            Items: []
+        });
+
+        mockedContext.dispatch.mockReturnValueOnce(mockedInfo);
+        mockedContext.dispatch.mockReturnValueOnce({});
+
+        await exportModule.startExport(mockedContext, opts);
+
+        expect(mockedContext.dispatch).toHaveBeenCalledWith('_request', expect.objectContaining({
+            url: `${mockedInfo._links.exports.href}/${opts.name}`,
+            method: 'put',
+            body: { prefix: '' }
+        }));
     });
 
     test('startKendraSyncExport with filter', async () => {
@@ -72,7 +136,8 @@ describe('export action test', () => {
 
     test('downloadExport', async () => {
         const opts = {
-            bucket: 'test-bucket'
+            bucket: 'test-bucket',
+            key: 'test-key'
         };
         const bodyString = 'test';
         const expectedResult = `{"qna":[${bodyString}]}`;
@@ -87,6 +152,23 @@ describe('export action test', () => {
         expect(result).toEqual(expectedResult);
     });
 
+    test('downloadExport with newlines', async () => {
+        const opts = {
+            bucket: 'test-bucket',
+            key: 'test-key'
+        };
+        const bodyString = 'line1\nline2\nline3';
+        const expectedResult = `{"qna":[${bodyString.replace(/\n/g, ',\n')}]}`;
+
+        s3ClientMock.on(GetObjectCommand).resolvesOnce({
+            Body: {
+                transformToString: () => bodyString
+            },
+        });
+        const result = await exportModule.downloadExport(mockedContext, opts);
+        expect(result).toEqual(expectedResult);
+    });
+
     test('waitForExport finds id', async () => {
         const opts = { id: 'test-id' };
         const mockedResults = {
@@ -95,8 +177,8 @@ describe('export action test', () => {
                 { id: 'not-the-test-id-you-want' },
             ],
         };
-        const resFunction = jest.fn().mockImplementation((job) => job);
-        const rejFunction = jest.fn().mockImplementation((error) => error);
+        const resFunction = vi.fn().mockImplementation((job) => job);
+        const rejFunction = vi.fn().mockImplementation((error) => error);
 
         // Mock the returned values from the dispatch method call in chronological order.
         mockedContext.dispatch
@@ -116,8 +198,8 @@ describe('export action test', () => {
                 { id: 'not-the-test-id-you-want' },
             ],
         };
-        const resFunction = jest.fn().mockImplementation((job) => job);
-        const rejFunction = jest.fn().mockImplementation((error) => error);
+        const resFunction = vi.fn().mockImplementation((job) => job);
+        const rejFunction = vi.fn().mockImplementation((error) => error);
 
         // Mock the returned values from the dispatch method call in chronological order.
         mockedContext.dispatch
@@ -131,8 +213,8 @@ describe('export action test', () => {
 
     test('waitForExport throws an error', async () => {
         const opts = {};
-        const resFunction = jest.fn().mockImplementation((job) => job);
-        const rejFunction = jest.fn().mockImplementation((error) => error);
+        const resFunction = vi.fn().mockImplementation((job) => job);
+        const rejFunction = vi.fn().mockImplementation((error) => error);
 
         // Force the dispatch method to throw an error.
         mockedContext.dispatch.mockImplementationOnce(() => {
@@ -164,7 +246,7 @@ describe('export action test', () => {
     });
 
     test('getExport', async () => {
-        const opts = { href: '' };
+        const opts = { href: 'https://example.com/export/123' };
         await exportModule.getExport(mockedContext, opts);
         expect(mockedContext.dispatch).toHaveBeenCalledTimes(1);
         expect(mockedContext.dispatch).toHaveBeenCalledWith('_request', {
@@ -184,7 +266,7 @@ describe('export action test', () => {
     });
 
     test('deleteExport', async () => {
-        const opts = { href: '' };
+        const opts = { href: 'https://example.com/export/123' };
         await exportModule.deleteExport(mockedContext, opts);
         expect(mockedContext.dispatch).toHaveBeenCalledTimes(1);
         expect(mockedContext.dispatch).toHaveBeenCalledWith('_request', {

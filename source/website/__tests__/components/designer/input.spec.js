@@ -2,13 +2,15 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const inputModule = require('../../../js/components/designer/input.vue');
-import { shallowMount } from '@vue/test-utils'
+import { describe, test, expect } from 'vitest';
+import { shallowMount } from '@vue/test-utils';
+
+const inputModule = await import('../../../js/components/designer/input.vue');
 
 describe('designer input module', () => {
 
     const shallowMountWithDefaults = () => {
-        const wrapper = shallowMount(inputModule, {
+        const wrapper = shallowMount(inputModule.default, {
             props: {
                 modelValue: [
                     { key: 'value1' },
@@ -28,19 +30,37 @@ describe('designer input module', () => {
     };
 
     test('mounted', () => {
-        const wrapper = shallowMount(inputModule);
+        const wrapper = shallowMount(inputModule.default, {
+            props: {
+                schema: { type: 'string' },
+                path: 'test.path',
+            },
+        });
         expect(wrapper.exists()).toBe(true);
     });
 
     test('computed properties', () => {
-        const wrapper = shallowMountWithDefaults();
-        wrapper.vm.$data.schema = {
-            maxLength: 10,
-            title: 'Books',
-            properties: {
-                key: {},
+        const wrapper = shallowMount(inputModule.default, {
+            props: {
+                modelValue: [
+                    { key: 'value1' },
+                    { key: 'value2' },
+                ],
+                required: true,
+                index: '1',
+                name: 'test-name',
+                schema: {
+                    type: 'object',
+                    maxLength: 10,
+                    title: 'Books',
+                    properties: {
+                        key: {},
+                    },
+                    items: { type: 'object', key: 'value3' },
+                },
+                path: 'qna.test-name[1]',
             },
-        };
+        });
 
         expect(wrapper.vm.singularTitle).toEqual('Book');
         expect(wrapper.vm.properties).toEqual([]);
@@ -96,8 +116,12 @@ describe('designer input module', () => {
         });
 
         test('maxLength rule returns error string when over limit', () => {
-            const wrapper = shallowMountWithDefaults();
-            wrapper.vm.$data.schema = { maxLength: 10 };
+            const wrapper = shallowMount(inputModule.default, {
+                props: {
+                    schema: { maxLength: 10, type: 'string' },
+                    path: 'test.path',
+                },
+            });
             const longText = 'this is a very long text that exceeds the limit';
             const result = wrapper.vm.$data.rules.maxLength(longText);
             expect(result).toBe('Maximum 10 characters allowed');
@@ -118,34 +142,50 @@ describe('designer input module', () => {
         });
 
         test('schema rule returns true when validation passes', () => {
-            const wrapper = shallowMountWithDefaults();
-            wrapper.vm.$data.schema = { type: 'string', maxLength: 100 };
+            const wrapper = shallowMount(inputModule.default, {
+                props: {
+                    modelValue: 'valid text',
+                    schema: { type: 'string', maxLength: 100 },
+                    path: 'test.path',
+                },
+            });
             const result = wrapper.vm.$data.rules.schema('valid text');
             expect(result).toBe(true);
         });
 
         test('schema rule returns error string when maxLength exceeded', () => {
-            const wrapper = shallowMountWithDefaults();
-            wrapper.vm.$data.schema = { type: 'string', maxLength: 10 };
+            const wrapper = shallowMount(inputModule.default, {
+                props: {
+                    modelValue: 'long text',
+                    schema: { type: 'string', maxLength: 10 },
+                    path: 'test.path',
+                },
+            });
             const longText = 'this is a very long text that exceeds the limit';
             const result = wrapper.vm.$data.rules.schema(longText);
             expect(result).toContain('Maximum 10 characters allowed');
         });
 
         test('schema rule converts AJV errors to readable strings', () => {
-            const wrapper = shallowMountWithDefaults();
-            wrapper.vm.$data.schema = { type: 'string', maxLength: 5 };
+            const wrapper = shallowMount(inputModule.default, {
+                props: {
+                    modelValue: 'text',
+                    schema: { type: 'string', maxLength: 5 },
+                    path: 'test.path',
+                },
+            });
             const result = wrapper.vm.$data.rules.schema('too long');
             expect(typeof result).toBe('string');
             expect(result).not.toBe(true);
         });
 
         test('required rule returns true for valid non-empty string', () => {
-            const wrapper = shallowMount(inputModule, {
+            const wrapper = shallowMount(inputModule.default, {
                 props: {
                     modelValue: 'test',
                     required: true,
                     schema: { type: 'string' },
+                    path: 'test.path',
                 },
             });
             const result = wrapper.vm.$data.rules.required('valid text');
@@ -153,11 +193,12 @@ describe('designer input module', () => {
         });
 
         test('required rule returns error for empty string when required', () => {
-            const wrapper = shallowMount(inputModule, {
+            const wrapper = shallowMount(inputModule.default, {
                 props: {
                     modelValue: '',
                     required: true,
                     schema: { type: 'string' },
+                    path: 'test.path',
                 },
             });
             const result = wrapper.vm.$data.rules.required('');
@@ -165,11 +206,12 @@ describe('designer input module', () => {
         });
 
         test('required rule returns true for empty string when not required', () => {
-            const wrapper = shallowMount(inputModule, {
+            const wrapper = shallowMount(inputModule.default, {
                 props: {
                     modelValue: '',
                     required: false,
                     schema: { type: 'string' },
+                    path: 'test.path',
                 },
             });
             const result = wrapper.vm.$data.rules.required('');
@@ -183,10 +225,11 @@ describe('designer input module', () => {
         });
 
         test('noSpace rule returns error when qid contains spaces', () => {
-            const wrapper = shallowMount(inputModule, {
+            const wrapper = shallowMount(inputModule.default, {
                 props: {
                     modelValue: 'test id',
                     schema: { type: 'string', name: 'qid' },
+                    path: 'test.qid',
                 },
             });
             const result = wrapper.vm.$data.rules.noSpace('test id');
@@ -194,10 +237,11 @@ describe('designer input module', () => {
         });
 
         test('noSpace rule returns true when qid has no spaces', () => {
-            const wrapper = shallowMount(inputModule, {
+            const wrapper = shallowMount(inputModule.default, {
                 props: {
                     modelValue: 'testid',
                     schema: { type: 'string', name: 'qid' },
+                    path: 'test.qid',
                 },
             });
             const result = wrapper.vm.$data.rules.noSpace('testid');
@@ -205,9 +249,10 @@ describe('designer input module', () => {
         });
 
         test('noSpace rule returns true for non-qid fields', () => {
-            const wrapper = shallowMount(inputModule, {
+            const wrapper = shallowMount(inputModule.default, {
                 props: {
                     modelValue: 'test value',
+                    path: 'test.path',
                     schema: { type: 'string', name: 'other' },
                 },
             });

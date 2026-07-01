@@ -144,13 +144,13 @@ v-container()
 </template>
 
 <script>
-const Vuex = require('vuex');
-const _ = require('lodash');
-const sanitizeHtml = require('sanitize-html');
+import Vuex from 'vuex';
+import _ from 'lodash';
+import sanitizeHtml from 'sanitize-html';
 
 const EMPTY_SENTINEL = 'EMPTY_STRING_BY_USER';
 
-module.exports = {
+export default {
     data() {
         return {
             showAddModal: false,

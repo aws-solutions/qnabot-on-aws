@@ -61,11 +61,10 @@ v-container#page-import
 </template>
 
 <script>
+import Vuex from 'vuex';
+import _ from 'lodash';
 
-const Vuex = require('vuex');
-const _ = require('lodash');
-
-module.exports = {
+export default {
     data() {
         return {
             status: '',

@@ -32,8 +32,8 @@ v-card.root-card
       )
         template(#activator="{ props }")
           v-btn.icon-button.text-white(
-            id="edit-sub-menu"
             v-bind="props"
+            id="edit-sub-menu"
             icon
           )
             v-icon more_vert
@@ -163,10 +163,19 @@ v-card.root-card
 </template>
 
 <script>
-require('vuex');
-const _ = require('lodash');
+import _ from 'lodash';
+import 'vuex';
+import qa from './qa.vue';
+import questions from './menu-questions.vue';
+import test from './menu-test.vue';
+import testAll from './menu-testall.vue';
+import deleteComponent from './delete.vue';
+import edit from './edit.vue';
+import build from './rebuild.vue';
+import alexa from './alexa.vue';
+import sync from './synckendra.vue';
 
-module.exports = {
+export default {
     data: () => ({
         drawer: false,
         active: null,
@@ -226,15 +235,15 @@ module.exports = {
         ]
     }),
     components: {
-        qa: require('./qa.vue').default,
-        questions: require('./menu-questions.vue').default,
-        test: require('./menu-test.vue').default,
-        testAll: require('./menu-testall.vue').default,
-        delete: require('./delete.vue').default,
-        edit: require('./edit.vue').default,
-        build: require('./rebuild.vue').default,
-        alexa: require('./alexa.vue').default,
-        sync: require('./synckendra.vue').default
+        qa,
+        questions,
+        test,
+        testAll,
+        delete: deleteComponent,
+        edit,
+        build,
+        alexa,
+        sync
     },
     computed: {
         empty() {

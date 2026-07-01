@@ -46,6 +46,12 @@ class BedrockLlm extends BedrockModelProviderPrototype {
         const inferenceConfig = _.pick(params, inferenceKeys);
         if (Object.keys(inferenceConfig).length > 0) {
             this.body.inferenceConfig = { ...this.body.inferenceConfig, ...inferenceConfig };
+            if (inferenceConfig.temperature !== undefined && inferenceConfig.topP === undefined) {
+                delete this.body.inferenceConfig.topP;
+            }
+            if (inferenceConfig.topP !== undefined && inferenceConfig.temperature === undefined) {
+                delete this.body.inferenceConfig.temperature;
+            }
         }
 
         const additionalModelRequestKeys = ['top_k'];

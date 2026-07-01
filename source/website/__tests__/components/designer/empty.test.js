@@ -2,7 +2,7 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const empty = require('../../../js/components/designer/empty');
+import empty from '../../../js/components/designer/empty.js';
 
 describe('designer empty helper function', () => {
     test('empty', () => {
@@ -22,16 +22,18 @@ describe('designer empty helper function', () => {
 
         const testArray = {
             type: 'array',
-            items: ['1'],
+            items: { type: 'string' },
         }
         const emptyArray = empty(testArray);
-        expect(emptyArray).toEqual([]);
+        expect(emptyArray).toEqual(['']);
 
         const testObject = {
             type: 'object',
-            key: 'value',
+            properties: {
+                key: { type: 'string' },
+            },
         };
         const emptyObject = empty(testObject);
-        expect(emptyObject).toEqual({});
+        expect(emptyObject).toEqual({ key: '' });
     });
 });

@@ -4,12 +4,14 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const stringify = require('json-stringify-pretty-compact');
-const example = stringify(require('./example'));
-const codeJS = require('./codejs.txt');
-const codePY = require('./codepy.txt');
+import stringify from 'json-stringify-pretty-compact';
+import example from './example.js';
+import codeJS from './codejs.txt?raw';
+import codePY from './codepy.txt?raw';
 
-module.exports = [{
+const exampleStr = stringify(example);
+
+export default [{
     title: 'Create Lambda Function',
     text: `
 1. Create a lambda function with a name that starts with "qna-", for example:  
@@ -56,7 +58,7 @@ The lambda handler must return the modified event object.
 
 ### Example Event
 ~~~json 
-${example}
+${exampleStr}
 ~~~
 `,
     buttons: [{
@@ -84,3 +86,4 @@ Ask question in QnAClient to see your new response
 `,
 },
 ];
+

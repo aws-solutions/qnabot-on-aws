@@ -3,7 +3,7 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-module.exports = {
+export default {
     // point to new Kendra Lambda instead of the old one
     startKendraV2Indexing(context, opts) {
         return context.dispatch('_request', {

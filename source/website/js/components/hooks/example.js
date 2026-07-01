@@ -11,7 +11,7 @@ const session = {
     }),
 };
 
-module.exports = {
+export default {
     req: {
         _type: 'LEX',
         question: 'help',

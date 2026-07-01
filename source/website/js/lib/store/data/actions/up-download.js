@@ -3,13 +3,15 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const validator = new (require('jsonschema').Validator)();
-const axios = require('axios');
-const util = require('./util');
+import { Validator } from 'jsonschema';
+import axios from 'axios';
+import util from './util';
+import schema from './schema.json';
 
+const validator = new Validator();
 const { api } = util;
 
-module.exports = {
+export default {
     async download(context) {
         try {
             const result = await api(context, 'list', { from: 'all' });
@@ -70,7 +72,7 @@ module.exports = {
     },
     async uploadProcess(context, { data }) {
         try {
-            const v = validator.validate(data, require('./schema.json'));
+            const v = validator.validate(data, schema);
             await (async () => {
                 if (v.valid) {
                     return api(context, 'bulk', data);

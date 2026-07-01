@@ -2,9 +2,10 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { vi } from 'vitest';
 import mockedContext from './mockedContext';
 
-const connect = require('../../../../../js/lib/store/api/actions/connect');
+import connect from '../../../../../js/lib/store/api/actions/connect';
 
 const contactFlow = {
     CallFlow: '',
@@ -14,8 +15,8 @@ const contactFlow = {
 
 describe('connect action test', () => {
     beforeEach(() => {
-        jest.resetAllMocks();
-        jest.spyOn(console, 'log').mockImplementation(jest.fn());
+        vi.resetAllMocks();
+        vi.spyOn(console, 'log').mockImplementation(vi.fn());
     });
 
     test('dispatch', () => {

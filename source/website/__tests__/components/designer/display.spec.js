@@ -2,12 +2,18 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { describe, test, expect } from 'vitest';
 import displayModule from '../../../js/components/designer/display.vue';
 import { shallowMount } from '@vue/test-utils';
 
 describe('display vue', () => {
     test('mounted', () => {
-        const wrapper = shallowMount(displayModule);
+        const wrapper = shallowMount(displayModule, {
+            props: {
+                schema: {},
+                modelValue: null,
+            },
+        });
         expect(wrapper.exists()).toBeTruthy();
     });
 

@@ -10,11 +10,11 @@ span(class="wrapper")
   )
     template(#activator="{ props }")
       v-btn(
+        v-bind="props"
         id="lex-rebuild"
         :disabled="loading"
         block
         variant="text"
-        v-bind="props"
         @click="build"
       ) Lex Rebuild
     v-card(id="lex-loading")
@@ -30,11 +30,10 @@ span(class="wrapper")
 </template>
 
 <script>
+import _ from 'lodash';
+import 'vuex';
 
-require('vuex');
-const _ = require('lodash');
-
-module.exports = {
+export default {
     data() {
         return {
             snackbar: false,

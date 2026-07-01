@@ -3,14 +3,20 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const util = require('./util');
+import util from './util.js';
+import _ from 'lodash';
 
 const { api } = util;
 
-module.exports = {
+export default {
     async schema(context) {
-        const x = await api(context, 'schema');
-        context.commit('schema', x);
+        try {
+            const x = await api(context, 'schema');
+            context.commit('schema', x);
+        } catch (error) {
+            console.error('Error fetching schema:', error);
+            throw error;
+        }
     },
     async botinfo(context) {
         try {

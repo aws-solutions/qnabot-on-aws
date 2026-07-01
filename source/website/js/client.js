@@ -8,16 +8,16 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import '@fontsource/material-icons';
-const { createApp } = require('vue');
-const { aliases, md } = require('vuetify/iconsets/md');
-const components = require('vuetify/components');
-const directives = require('vuetify/directives');
-const { createVuetify } = require('vuetify');
-const { createStore } = require('vuex');
-require('vuetify/styles');
-const axios = require('axios');
-require('aws-lex-web-ui/dist/lex-web-ui.min.css');
-const Auth = require('./lib/client-auth');
+import { createApp } from 'vue';
+import { aliases, md } from 'vuetify/iconsets/md';
+import * as components from 'vuetify/components';
+import * as directives from 'vuetify/directives';
+import { createVuetify } from 'vuetify';
+import { createStore } from 'vuex';
+import 'vuetify/styles';
+import axios from 'axios';
+import 'aws-lex-web-ui/dist/lex-web-ui.min.css';
+import Auth from './lib/client-auth';
 
 let store = null;
 let authConfig = null;
@@ -92,10 +92,10 @@ document.addEventListener('DOMContentLoaded', () => {
         Config,
         Auth(),
     ])
-        .then((results) => {
+        .then(async (results) => {
             const configResult = results[0];
             const auth = results[1];
-            const LexWebUi = require('aws-lex-web-ui/dist/lex-web-ui.min.js');
+            const LexWebUi = await import('aws-lex-web-ui/dist/lex-web-ui.min.js');
             const App = createApp(app);
             const vuetify = createVuetify({
                 components,

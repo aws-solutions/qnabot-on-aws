@@ -50,34 +50,38 @@ v-container
 </template>
 
 <script>
+import Vuex from 'vuex';
+import { marked } from 'marked';
+import handlebars from 'handlebars';
+import _ from 'lodash';
+import stringify from 'json-stringify-pretty-compact';
+import codeJS from './codejs.txt?raw';
+import codePY from './codepy.txt?raw';
 
 import hljs from 'highlight.js/lib/core';
 import javascriptlang from 'highlight.js/lib/languages/javascript';
 import pythonlang from 'highlight.js/lib/languages/python';
 import jsonlang from 'highlight.js/lib/languages/json';
 
-const Vuex = require('vuex');
-const markdown = require('marked');
-
 hljs.registerLanguage('javascript', javascriptlang);
 hljs.registerLanguage('python', pythonlang);
 hljs.registerLanguage('json', jsonlang);
 
-markdown.setOptions({
+marked.setOptions({
     highlight(code) {
         return hljs.highlightAuto(code).value;
     },
 });
-const renderer = new markdown.Renderer();
+const renderer = new marked.Renderer();
 renderer.link = function (href, title, text) {
     return `<a href="${href}" title="${title}" target="_blank">${text}</a>`;
 };
-const handlebars = require('handlebars');
-const _ = require('lodash');
-const stringify = require('json-stringify-pretty-compact');
-const codeJS = require('./codejs.txt');
-const codePY = require('./codepy.txt');
-const example = stringify(require('./example'));
+
+
+import exampleData from './example.js';
+import stepsData from './steps.js';
+
+const example = stringify(exampleData);
 
 export default {
     components: {
@@ -87,7 +91,7 @@ export default {
             visible: false,
             stepNumber: 1,
             prefix: 'qna',
-            stepsRaw: require('./steps.js'),
+            stepsRaw: stepsData,
         };
     },
     computed:
@@ -102,7 +106,7 @@ export default {
                     return _.map(this.stepsRaw, (x) => {
                         const temp = handlebars.compile(x.text);
                         const y = Object.assign({},x);
-                        y.text = markdown.parse(temp(self.$store.state.bot), { renderer });
+                        y.text = marked.parse(temp(self.$store.state.bot), { renderer });
                         return y;
                     });
                 },

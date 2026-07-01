@@ -1,3 +1,14 @@
+/* Material Icons font-face declaration */
+/* This file is loaded via <link> tag in index.html */
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(../../../node_modules/@fontsource/material-icons/files/material-icons-latin-400-normal.woff2) format('woff2'),
+         url(../../../node_modules/@fontsource/material-icons/files/material-icons-latin-400-normal.woff) format('woff');
+}
+
 .material-icons {
     font-family: 'Material Icons'; /*NOSONAR - Required for material icons*/
     font-weight: normal;

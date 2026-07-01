@@ -2,12 +2,33 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { describe, test, expect, vi } from 'vitest';
 import adminModule from '../js/admin.vue';
 import { shallowMount } from '@vue/test-utils';
 
 describe('js admin module', () => {
     test('mounted', () => {
-        const wrapper = shallowMount(adminModule);
+        const store = {
+            state: {
+                route: { name: '' },
+                error: '',
+                user: { name: '' },
+                info: {
+                    Version: '',
+                    BuildDate: '',
+                    StackName: '',
+                    _links: {},
+                },
+            },
+        };
+        
+        const wrapper = shallowMount(adminModule, {
+            global: {
+                mocks: {
+                    $store: store,
+                },
+            },
+        });
         expect(wrapper.exists()).toBe(true);
     });
 
@@ -141,7 +162,18 @@ describe('js admin module', () => {
 
     test('logout', () => {
         const store = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
+            state: {
+                route: { name: '' },
+                error: '',
+                user: { name: '' },
+                info: {
+                    Version: '',
+                    BuildDate: '',
+                    StackName: '',
+                    _links: {},
+                },
+            },
         };
         const wrapper = shallowMount(adminModule, {
             global: {

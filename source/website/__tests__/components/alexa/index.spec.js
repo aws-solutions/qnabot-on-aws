@@ -2,6 +2,8 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { vi } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import alexaModule from '../../../js/components/alexa/index.vue';
 import { shallowMount } from '@vue/test-utils';
 
@@ -10,9 +12,9 @@ describe('alexa index component', () => {
     let wrapper;
 
     beforeEach(() => {
-        jest.resetAllMocks();
+        vi.resetAllMocks();
         store = {
-            dispatch: jest.fn().mockImplementation(() => {
+            dispatch: vi.fn().mockImplementation(() => {
                 return Promise.resolve({ result: {} });
             }),
             state: {

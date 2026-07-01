@@ -2,6 +2,7 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { describe, test, expect } from 'vitest';
 import deleteModule from '../../../js/components/designer/delete.vue';
 import { shallowMount } from '@vue/test-utils';
 
@@ -33,7 +34,21 @@ describe('delete vue', () => {
     });
 
     test('cancel', () => {
-        const wrapper = shallowMount(deleteModule);
+        const store = {
+            state: {
+                data: {
+                    QAs: [],
+                    filter: '',
+                },
+            },
+        };
+        const wrapper = shallowMount(deleteModule, {
+            global: {
+                mocks: {
+                    $store: store,
+                }
+            }
+        });
         wrapper.vm.$data.dialog = true;
         wrapper.vm.cancel();
         expect(wrapper.vm.$data.dialog).toBe(false);

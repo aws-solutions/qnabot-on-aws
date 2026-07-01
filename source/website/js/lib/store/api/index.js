@@ -3,9 +3,9 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const Vuex = require('vuex');
+import actions from './actions';
 
-module.exports = {
+export default {
     namespaced: true,
     state: {
         loading: false,
@@ -16,5 +16,5 @@ module.exports = {
         },
     },
     getters: {},
-    actions: require('./actions'),
+    actions,
 };

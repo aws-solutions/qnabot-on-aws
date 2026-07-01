@@ -637,8 +637,8 @@ module.exports = {
                             Effect: 'Allow',
                             Action: ['lambda:InvokeFunction'],
                             Resource: [
-                                'arn:aws:lambda:*:*:function:qna*',
-                                'arn:aws:lambda:*:*:function:QNA*',
+                                { 'Fn::Sub': 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:qna*' },
+                                { 'Fn::Sub': 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:QNA*' },
                             ].concat(require('../examples/outputs').names
                                 .map((x) => ({ 'Fn::GetAtt': ['ExamplesStack', `Outputs.${x}`] }))),
                         }],
@@ -649,8 +649,8 @@ module.exports = {
                             Effect: 'Allow',
                             Action: ['lambda:InvokeFunction'],
                             Resource: [
-                                'arn:aws:lambda:*:*:function:qna*',
-                                'arn:aws:lambda:*:*:function:QNA*',
+                                { 'Fn::Sub': 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:qna*' },
+                                { 'Fn::Sub': 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:QNA*' },
                             ],
                         }],
                     },

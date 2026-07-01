@@ -66,6 +66,7 @@ module.exports = Promise.resolve(require('../master')).then((base) => {
         'BedrockKnowledgeBaseModel',
         'LogRetentionPeriod',
         'EnableStreaming',
+        'AlexaSkillIds',
     ]);
     base.Metadata = {
         'AWS::CloudFormation::Interface': {
@@ -124,8 +125,18 @@ module.exports = Promise.resolve(require('../master')).then((base) => {
                         'KendraWebPageIndexId',
                         'KendraFaqIndexId',
                         'AltSearchKendraIndexes',
+                        'AltSearchKendraIndexAuth',
                         'BedrockKnowledgeBaseId',
                         'BedrockKnowledgeBaseModel',
+                        'LogRetentionPeriod',
+                    ],
+                },
+                {
+                    Label: {
+                        default: 'Step 2E: Set Alexa integration parameters (optional)',
+                    },
+                    Parameters: [
+                        'AlexaSkillIds',
                     ],
                 },
             ],
@@ -145,6 +156,9 @@ module.exports = Promise.resolve(require('../master')).then((base) => {
     base.Conditions.EmbeddingsBedrock = { 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'BEDROCK'] };
     base.Conditions.EmbeddingsLambda = { 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'LAMBDA'] };
     base.Conditions.EmbeddingsLambdaArn = { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'EmbeddingsLambdaArn' }, ''] }] };
+    for (let i = 0; i < 30; i++) {
+        base.Conditions[`AlexaSkill${i}Enabled`] = { 'Fn::Not': [{ 'Fn::Equals': [{ 'Fn::Select': [i, { 'Fn::Split': [',', { 'Fn::Join': [',', [{ Ref: 'AlexaSkillIds' }, ',,,,,,,,,,,,,,,,,,,,,,,,,,,,,']] }] }] }, ''] }] };
+    }
 
     let out = JSON.stringify(base);
 

@@ -2,11 +2,11 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const _ = require('lodash');
-const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
-const { DynamoDBClient, ScanCommand } = require('@aws-sdk/client-dynamodb');
-const { unmarshall } = require('@aws-sdk/util-dynamodb');
-const util = require('./../../../../capability/util');
+import _ from 'lodash';
+import {  S3Client, GetObjectCommand  } from '@aws-sdk/client-s3';
+import {  DynamoDBClient, ScanCommand  } from '@aws-sdk/client-dynamodb';
+import {  unmarshall  } from '@aws-sdk/util-dynamodb';
+import util from './../../../../capability/util';
 
 const EMPTY_SENTINEL = 'EMPTY_STRING_BY_USER';
 
@@ -78,7 +78,7 @@ async function listSettings(context) {
 }
 
 const failed = false;
-module.exports = {
+export default {
     async startExport(context, opts) {
         const info = await context.dispatch('_request', {
             url: context.rootState.info._links.jobs.href,

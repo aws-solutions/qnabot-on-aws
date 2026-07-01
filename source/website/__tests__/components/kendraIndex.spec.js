@@ -2,6 +2,8 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { vi } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import kendraIndexModule from '../../js/components/kendraIndex.vue';
 import { shallowMount } from '@vue/test-utils';
 
@@ -47,16 +49,16 @@ describe('kendraIndex component', () => {
     };
 
     beforeEach(() => {
-        jest.resetAllMocks();
-        consoleLogSpy = jest.spyOn(console, "log")
-        consoleLogSpy.mockImplementation(jest.fn());
-        jest.spyOn(global, 'setTimeout').mockImplementation((fn) => {
+        vi.resetAllMocks();
+        consoleLogSpy = vi.spyOn(console, "log")
+        consoleLogSpy.mockImplementation(vi.fn());
+        vi.spyOn(global, 'setTimeout').mockImplementation((fn) => {
             if (typeof fn === 'function') {
                 fn();
             }
         });
         store = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
         };
     });
 

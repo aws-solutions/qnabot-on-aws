@@ -3,10 +3,10 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
-const util = require('../../../../capability/util');
+import {  S3Client, GetObjectCommand  } from '@aws-sdk/client-s3';
+import util from '../../../../capability/util';
 
-module.exports = {
+export default {
     async startTestAll(context, opts) {
         const info = await context.dispatch('_request', {
             url: context.rootState.info._links.jobs.href,

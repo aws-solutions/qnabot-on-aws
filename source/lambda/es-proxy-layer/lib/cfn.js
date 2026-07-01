@@ -3,7 +3,7 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const cfnLambda = require('cfn-lambda');
+const cfnHandler = require('./cfnHandler');
 const qnabot = require('qnabot/logging');
 const request = require('./request');
 
@@ -198,32 +198,5 @@ exports.Delete = async function (ID, params) {
     }
 };
 
-exports.resource = cfnLambda({
-    Create: async (params, reply) => {
-        try {
-            const result = await exports.Create(params);
-            reply(null, result.PhysicalResourceId, result.FnGetAttrsDataObj);
-        } catch (error) {
-            qnabot.error('Create operation failed:', error);
-            reply(error);
-        }
-    },
-    Update: async (ID, params, oldparams, reply) => {
-        try {
-            const result = await exports.Update(ID, params, oldparams);
-            reply(null, result.PhysicalResourceId, result.FnGetAttrsDataObj);
-        } catch (error) {
-            qnabot.error('Update operation failed:', error);
-            reply(error);
-        }
-    },
-    Delete: async (ID, params, reply) => {
-        try {
-            const result = await exports.Delete(ID, params);
-            reply(null, result.PhysicalResourceId, result.FnGetAttrsDataObj);
-        } catch (error) {
-            qnabot.error('Delete operation failed:', error);
-            reply(error);
-        }
-    }
-});
+exports.handler = (event, context) => cfnHandler(exports, event, context);
+exports.resource = exports.handler; // backward compat: resource.js calls require('cfn').resource

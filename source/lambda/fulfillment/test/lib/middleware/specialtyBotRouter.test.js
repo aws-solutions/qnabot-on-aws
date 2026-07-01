@@ -40,6 +40,14 @@ describe('when calling routeRequest function with Lambda as target or with exit 
         expect(response.res.session.appContext.altMessages).toEqual({ "html": " <i> Welcome back to QnABot. </i>" });
     });
 
+    test('should block cross-account lambda:: invocation', async () => {
+        process.env.AWS_ACCOUNT_ID = '111122223333';
+        const response = await specialtyBotRouter.routeRequest(botRouterFixtures.createRequestObject("What is QnABot"),
+            botRouterFixtures.createResponseObject(), "lambda::arn:aws:lambda:us-east-1:444455556666:function:evil", null);
+        expect(lambdaMock.calls(InvokeCommand)).toHaveLength(0);
+        expect(response.res.session.qnabotcontext.specialtyBot).not.toBeDefined();
+    });
+
     test('should return lambda response when target bot is lambda function', async () => {
         lambdaMock.on(InvokeCommand).resolves(botRouterFixtures.lambdaResponse);
         const response = await specialtyBotRouter.routeRequest(botRouterFixtures.createRequestObject("What is QnABot"),
@@ -197,5 +205,75 @@ describe('when calling routeRequest function with LexV2 as target', () => {
         const response = await specialtyBotRouter.routeRequest(botRouterFixtures.createRequestObject("What is QnABot"),
             mockResponse, "lexv2::test_bot", null);
         expect(response.res.message).toEqual("Test Message. Welcome back to QnABot.");
+    });
+});
+
+describe('when calling routeRequest with mergeAttributesToReceive and sBAttributesToReceive', () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test('should merge session attributes from specialty bot response when sBAttributesToReceive is set', async () => {
+        jest.spyOn(LexRuntimeV2.prototype, 'recognizeText')
+            .mockImplementation((request, callback) => {
+                const mockResponse = botRouterFixtures.getLexV2Response('ReadyForFulfillment', 'Test Message.', 'testIntent');
+                mockResponse.sessionState.sessionAttributes = { myAttribute: 'mergedValue' };
+                callback(null, mockResponse);
+            });
+        const req = botRouterFixtures.createRequestObject('What is QnABot');
+        req.session.qnabotcontext.sBAttributesToReceive = 'myAttribute';
+        req.session.qnabotcontext.sBAttributesToReceiveNamespace = 'testNamespace';
+        const response = await specialtyBotRouter.routeRequest(req,
+            botRouterFixtures.createResponseObject(), 'lexv2::test_bot', null);
+        expect(response.res.message).toEqual('Test Message. Welcome back to QnABot.');
+        // Verify the attribute was merged into the session under the configured namespace
+        expect(response.res.session.testNamespace.myAttribute).toEqual('mergedValue');
+    });
+
+    test('should not break lambda path when specialtyBotMergeAttributes is set', async () => {
+        process.env.AWS_ACCOUNT_ID = '111122223333';
+        const lambdaPayload = {
+            message: 'Lambda Response',
+            dialogState: 'ElicitSlot',
+            sessionAttributes: { myAttribute: 'lambdaAttrValue' },
+        };
+        const { Lambda, InvokeCommand } = require('@aws-sdk/client-lambda');
+        const awsMock = require('aws-sdk-client-mock');
+        const lambdaMockLocal = awsMock.mockClient(Lambda);
+        lambdaMockLocal.on(InvokeCommand).resolves({
+            Payload: JSON.stringify(lambdaPayload),
+        });
+        const req = botRouterFixtures.createRequestObject('Hello');
+        req.session.myAttribute = 'lambdaAttrValue';
+        req.session.qnabotcontext.specialtyBotMergeAttributes = 'myAttribute';
+        const response = await specialtyBotRouter.routeRequest(req,
+            botRouterFixtures.createResponseObject(), 'lambda::arn:aws:lambda:us-east-1:111122223333:function:mockBot', null);
+        // specialtyBotMergeAttributes caused myAttribute to be sent in the lambda payload;
+        // the response message should reflect the lambda reply
+        expect(response.res.message).toEqual('Lambda Response');
+    });
+});
+
+describe('when calling routeRequest with multi-language support', () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test('should handle translate_res when ENABLE_MULTI_LANGUAGE_SUPPORT is true and language differs', async () => {
+        jest.spyOn(LexRuntimeV2.prototype, 'recognizeText')
+            .mockImplementation((request, callback) => {
+                callback(null, botRouterFixtures.getLexV2Response('ReadyForFulfillment', 'Test Message.', 'testIntent'));
+            });
+        // Override the module-level mock to return French so translate_res doesn't exit early
+        multilanguage.get_userLanguages.mockImplementationOnce(() =>
+            Promise.resolve({ Languages: [{ LanguageCode: 'fr', Score: 1 }] })
+        );
+        const req = botRouterFixtures.createRequestObject('What is QnABot');
+        req._settings.ENABLE_MULTI_LANGUAGE_SUPPORT = true;
+        const response = await specialtyBotRouter.routeRequest(req,
+            botRouterFixtures.createResponseObject(), 'lexv2::test_bot', null);
+        // get_translation should have been called to translate the response into French
+        expect(multilanguage.get_translation).toHaveBeenCalled();
+        expect(response.res).toBeDefined();
     });
 });

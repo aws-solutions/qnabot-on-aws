@@ -2,13 +2,14 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { describe, test, expect, vi } from 'vitest';
 import alexaModule from '../../../js/components/designer/alexa.vue';
 import { shallowMount } from '@vue/test-utils';
 
 describe('addSetting vue', () => {
     Object.assign(navigator, {
         clipboard: {
-            writeText: jest.fn(),
+            writeText: vi.fn(),
         },
     });
 
@@ -19,7 +20,7 @@ describe('addSetting vue', () => {
 
     test('download', async () => {
         const store = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
             state: {
                 bot: {
                     alexa: '',

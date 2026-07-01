@@ -2,8 +2,10 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const synckendraModule = require('../../../js/components/designer/synckendra.vue');
+import { describe, test, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
+
+const synckendraModule = await import('../../../js/components/designer/synckendra.vue');
 
 describe('designer synckendra module', () => {
     const dispatchMock = (dispatchType) => {
@@ -27,9 +29,9 @@ describe('designer synckendra module', () => {
 
     test('mounted', () => {
         const store = {
-            dispatch: jest.fn().mockImplementation((dispatchType) => dispatchMock(dispatchType)),
+            dispatch: vi.fn().mockImplementation((dispatchType) => dispatchMock(dispatchType)),
         }
-        const wrapper = shallowMount(synckendraModule, {
+        const wrapper = shallowMount(synckendraModule.default, {
             global: {
                 mocks: {
                     $store: store,
@@ -41,9 +43,9 @@ describe('designer synckendra module', () => {
 
     test('refresh', async () => {
         const store = {
-            dispatch: jest.fn().mockImplementation((dispatchType) => dispatchMock(dispatchType)),
+            dispatch: vi.fn().mockImplementation((dispatchType) => dispatchMock(dispatchType)),
         }
-        const wrapper = shallowMount(synckendraModule, {
+        const wrapper = shallowMount(synckendraModule.default, {
             global: {
                 mocks: {
                     $store: store,
@@ -57,9 +59,9 @@ describe('designer synckendra module', () => {
 
     test('start', async() => {
         const store = {
-            dispatch: jest.fn().mockImplementation((dispatchType) => dispatchMock(dispatchType)),
+            dispatch: vi.fn().mockImplementation((dispatchType) => dispatchMock(dispatchType)),
         };
-        const wrapper = shallowMount(synckendraModule, {
+        const wrapper = shallowMount(synckendraModule.default, {
             global: {
                 mocks: {
                     $store: store,

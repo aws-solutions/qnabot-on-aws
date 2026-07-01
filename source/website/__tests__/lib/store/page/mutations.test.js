@@ -2,11 +2,12 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const mutations = require('../../../../js/lib/store/page/mutations');
+import { vi } from 'vitest';
+import mutations from '../../../../js/lib/store/page/mutations.js';
 
 describe('mutations page test', () => {
     beforeEach(() => {
-        jest.resetAllMocks();
+        vi.resetAllMocks();
     });
 
     test('setMode', () => {

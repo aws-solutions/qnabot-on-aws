@@ -39,12 +39,12 @@ v-container(fluid)
 </template>
 
 <script>
+import _ from 'lodash';
+import 'vuex';
+import 'file-saver';
+import add from './add.vue';
 
-require('vuex');
-require('file-saver');
-const _ = require('lodash');
-
-module.exports = {
+export default {
     data() {
         return {
             dialog: false,
@@ -56,7 +56,7 @@ module.exports = {
         };
     },
     components: {
-        add: require('./add.vue').default,
+        add,
     },
     directives: {
         chosen: {

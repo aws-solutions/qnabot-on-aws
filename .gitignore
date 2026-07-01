@@ -1,4 +1,6 @@
-build
+/build
+source/build
+source/website/build
 
 codescan-*
 
@@ -57,7 +59,6 @@ typings/
 # dotenv environment variables file
 .env
 
-build
 source/config.json
 **/.DS_Store
 .idea/
@@ -116,4 +117,5 @@ Pipfile.lock
 **/requirements.txt
 .aider*
 
+# kiro
 .kiro

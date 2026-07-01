@@ -542,7 +542,6 @@ class TestQuestionDesigner:
         code_xpath = '//code[contains(string(), "firstName")]'
         checkbox_xpath = '//ul//li//input[@type="checkbox"]'
         image_xpath = '//img[@src="https://github.com/aws-solutions/qnabot-on-aws/blob/main/assets/examples/photos/west%20coast%20grocery.jpg?raw=true" and @alt="West Coast Grocery"]'
-        iframe_xpath = '//iframe[@src="https://www.youtube.com/embed/OE4MrFx2XCs"]'
 
         markdown_element_xpaths = [
             link_xpath, 
@@ -557,7 +556,6 @@ class TestQuestionDesigner:
             code_xpath, 
             checkbox_xpath, 
             image_xpath, 
-            iframe_xpath
         ]
     
         chat_page.send_message(question['q'][0])

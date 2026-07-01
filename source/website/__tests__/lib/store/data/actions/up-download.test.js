@@ -2,18 +2,19 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const upDownloadModule = require('../../../../../js/lib/store/data/actions/up-download');
-const axios = require('axios');
-const util = require('../../../../../js/lib/store/data/actions/util');
-const { Validator } = require('jsonschema');
+import { vi } from 'vitest';
+import upDownloadModule from '../../../../../js/lib/store/data/actions/up-download';
+import axios from 'axios';
+import util from '../../../../../js/lib/store/data/actions/util';
+import { Validator } from 'jsonschema';
 
-jest.mock('axios');
-jest.mock('../../../../../js/lib/store/data/actions/util');
+vi.mock('axios');
+vi.mock('../../../../../js/lib/store/data/actions/util');
 
 describe('up-download data action', () => {
     const mockedContext = {
-        dispatch: jest.fn(),
-        commit: jest.fn(),
+        dispatch: vi.fn(),
+        commit: vi.fn(),
         state: {
             QAs: [
                 {
@@ -43,8 +44,8 @@ describe('up-download data action', () => {
     };
 
     beforeEach(() => {
-        jest.resetAllMocks();
-        jest.spyOn(console, 'log').mockImplementation(jest.fn());
+        vi.resetAllMocks();
+        vi.spyOn(console, 'log').mockImplementation(vi.fn());
     });
 
     test('download success', async () => {
@@ -106,7 +107,7 @@ describe('up-download data action', () => {
             unknownKey: 'someValue',
         };
         const expectedErrorMessage = 'invalid params';
-        jest.spyOn(Promise, 'reject');
+        vi.spyOn(Promise, 'reject');
         await expect(upDownloadModule.upload(mockedContext, mockedParams))
             .rejects.toEqual(expectedErrorMessage);
         expect(Promise.reject).toHaveBeenCalledWith(expectedErrorMessage);
@@ -125,7 +126,7 @@ describe('up-download data action', () => {
     });
 
     test('uploadProcess has valid qna', async () => {
-        jest.spyOn(Validator.prototype, 'validate').mockImplementationOnce(() => ({ valid: true }));
+        vi.spyOn(Validator.prototype, 'validate').mockImplementationOnce(() => ({ valid: true }));
         await upDownloadModule.uploadProcess(mockedContext, { data: 'test value' });
         expect(util.api).toHaveBeenCalledTimes(1);
         expect(util.api).toHaveBeenCalledWith(
@@ -143,16 +144,13 @@ describe('up-download data action', () => {
                 { stack: 'testFunction2' },
             ],
         };
-        const expectedRejectParam = `Invalid QnA:${validationResult.errors.map((err) => err.stack).join(',')}`;
-        jest.spyOn(Validator.prototype, 'validate').mockImplementationOnce(() => validationResult);
-        jest.spyOn(Promise, 'reject');
-        await upDownloadModule.uploadProcess(mockedContext, {});
+        vi.spyOn(Validator.prototype, 'validate').mockImplementationOnce(() => validationResult);
+        await expect(upDownloadModule.uploadProcess(mockedContext, {})).rejects.toThrow('Failed in upload process');
         expect(util.api).toHaveBeenCalledTimes(0);
-        expect(Promise.reject).toHaveBeenCalledWith(expectedRejectParam);
     });
 
     test('uploadProcess throws an error', async () => {
-        jest.spyOn(Validator.prototype, 'validate').mockImplementationOnce(() => {
+        vi.spyOn(Validator.prototype, 'validate').mockImplementationOnce(() => {
             throw new Error('test error');
         });
         const expectedError = new Error('Failed in upload process');

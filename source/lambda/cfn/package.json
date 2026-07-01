@@ -1,6 +1,6 @@
 {
     "name": "cfn",
-    "version": "7.3.16",
+    "version": "7.4.0",
     "description": "QnABot Cfn Lambda",
     "main": "index.js",
     "scripts": {
@@ -31,7 +31,6 @@
         "@aws-sdk/util-dynamodb": "^3.699.0",
         "@aws-sdk/client-dynamodb": "^3.699.0",
         "body-parser": "^1.20.3",
-        "cfn-lambda": "^5.1.0",
         "jszip": "^3.10.1",
         "lodash": "^4.17.23"
     },

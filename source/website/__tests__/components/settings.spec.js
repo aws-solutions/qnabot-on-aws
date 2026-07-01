@@ -2,6 +2,7 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { describe, test, expect, beforeEach, vi } from 'vitest';
 import settingsModule from '../../js/components/settings.vue';
 import { shallowMount } from '@vue/test-utils';
 
@@ -27,11 +28,11 @@ describe('settings module', () => {
     };
 
     beforeEach(() => {
-        jest.resetAllMocks();
-        consoleLogSpy = jest.spyOn(console, "log")
-        consoleLogSpy.mockImplementation(jest.fn());
+        vi.resetAllMocks();
+        consoleLogSpy = vi.spyOn(console, "log")
+        consoleLogSpy.mockImplementation(vi.fn());
         store = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
         };
     });
 
@@ -116,9 +117,9 @@ describe('settings module', () => {
     });
 
     test('resetToDefaults', async () => {
-        const windowSpy = jest.spyOn(window, 'window', 'get');
+        const windowSpy = vi.spyOn(window, 'window', 'get');
         windowSpy.mockImplementation(() => ({
-            scrollTo: jest.fn(),
+            scrollTo: vi.fn(),
         }));
         const settings = [
             {}, // default settings

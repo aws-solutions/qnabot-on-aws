@@ -112,14 +112,14 @@ div.input
 </template>
 
 <script>
-require('vuex');
-const _ = require('lodash');
-const Ajv = require('ajv');
-const empty = require('./empty');
+import _ from 'lodash';
+import Ajv from 'ajv';
+import empty from './empty';
+import 'vuex';
 
 const ajv = new Ajv();
 
-module.exports = {
+export default {
     props: ['schema', 'modelValue', 'required', 'name', 'index', 'path', 'pick', 'omit'],
     name: 'schema-input',
     data() {
@@ -138,7 +138,8 @@ module.exports = {
                     }
                     return true;
                 },
-                schema(value) {
+                // rule javascript:S3800 - Vue validation rules expect true or string (https://vuetifyjs.com/en/components/text-fields/#validation-26-rules)
+                schema(value) { // NOSONAR
                     const validate = ajv.compile(self.schema || true);
                     if (validate(value)) {
                         return true;

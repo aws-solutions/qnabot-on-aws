@@ -29,6 +29,52 @@ describe('when calling getLambdaArn function', () => {
     });
 });
 
+describe('when calling isSameAccountArn function', () => {
+    const ACCOUNT_ID = '111122223333';
+    const originalAccountId = process.env.AWS_ACCOUNT_ID;
+
+    beforeEach(() => {
+        process.env.AWS_ACCOUNT_ID = ACCOUNT_ID;
+    });
+
+    afterEach(() => {
+        if (originalAccountId === undefined) {
+            delete process.env.AWS_ACCOUNT_ID;
+        } else {
+            process.env.AWS_ACCOUNT_ID = originalAccountId;
+        }
+        jest.clearAllMocks();
+    });
+
+    test('should return true for bare function name (no arn: prefix)', () => {
+        expect(util.isSameAccountArn('my-function')).toBe(true);
+    });
+
+    test('should return true for function name without arn prefix', () => {
+        expect(util.isSameAccountArn('qnabot-fulfillment')).toBe(true);
+    });
+
+    test('should return true for same-account full ARN', () => {
+        const arn = `arn:aws:lambda:us-east-1:${ACCOUNT_ID}:function:my-function`;
+        expect(util.isSameAccountArn(arn)).toBe(true);
+    });
+
+    test('should return false for cross-account full ARN', () => {
+        const arn = 'arn:aws:lambda:us-east-1:444455556666:function:evil-function';
+        expect(util.isSameAccountArn(arn)).toBe(false);
+    });
+
+    test('should return false for ARN with different region and account ID', () => {
+        const arn = 'arn:aws:lambda:us-west-2:999988887777:function:attacker';
+        expect(util.isSameAccountArn(arn)).toBe(false);
+    });
+
+    test('should return falsy for malformed ARN with missing account ID', () => {
+        const arn = 'arn:aws:lambda:us-east-1::function:no-account';
+        expect(util.isSameAccountArn(arn)).toBeFalsy();
+    });
+});
+
 describe('when calling invokeLambda function', () => {
     beforeEach(() => {
         lambdaMock.reset();

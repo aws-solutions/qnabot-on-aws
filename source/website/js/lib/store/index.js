@@ -3,10 +3,16 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const Vuex = require('vuex');
-const { createStore } = require('vuex');
+import { createStore } from 'vuex';
+import mutations from './mutations';
+import getters from './getters';
+import actions from './actions';
+import user from './user';
+import api from './api';
+import data from './data';
+import page from './page';
 
-module.exports = createStore({
+export default createStore({
     state: {
         info: {},
         bot: {
@@ -22,13 +28,13 @@ module.exports = createStore({
         genesys: {},
         error: '',
     },
-    mutations: require('./mutations'),
-    getters: require('./getters'),
-    actions: require('./actions'),
+    mutations,
+    getters,
+    actions,
     modules: {
-        user: require('./user'),
-        api: require('./api'),
-        data: require('./data'),
-        page: require('./page'),
+        user,
+        api,
+        data,
+        page,
     },
 });

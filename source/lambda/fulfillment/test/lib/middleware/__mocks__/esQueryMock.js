@@ -84,5 +84,8 @@ module.exports = async function query(req, res) {
     if(req.session.qnabotcontext.elicitResponse.responsebot === "testBot"){
         res.session.qnabotcontext.elicitResponse = {"progress": "Fulfilled"}
     }
+    if(req.session._mockBotRouting) {
+        response.res.result.botRouting = req.session._mockBotRouting;
+    }
     return response;
 };

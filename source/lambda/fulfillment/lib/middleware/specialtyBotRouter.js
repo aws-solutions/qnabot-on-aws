@@ -13,6 +13,7 @@ const _ = require('lodash');
 const { Lambda } = require('@aws-sdk/client-lambda');
 const { LexRuntimeV2 } = require('@aws-sdk/client-lex-runtime-v2');
 const customSdkConfig = require('sdk-config/customSdkConfig');
+const util = require('./util');
 const region = process.env.AWS_REGION || 'us-east-1';
 const qnabot = require('qnabot/logging');
 const {get_userLanguages , get_translation} = require('./multilanguage.js');
@@ -214,6 +215,10 @@ async function handleRequest(req, res, botName) {
     if (botName.toLowerCase().startsWith('lambda::')) {
         // target bot is a Lambda Function
         const lambdaName = botName.split('::')[1];
+        if (!util.isSameAccountArn(lambdaName)) {
+            qnabot.log(`Blocked cross-account specialtyBot lambda: ${lambdaName}`);
+            return { message: '', sessionAttributes: {}, _blocked: true };
+        }
         qnabot.log('Calling Lambda:', lambdaName);
         const response = await lambdaClientRequester(lambdaName, req);
         qnabot.log(`lambda response: ${JSON.stringify(response, null, 2)}`);
@@ -514,6 +519,11 @@ async function processResponse(req, res, hook) {
     }
     const botResp = await handleRequest(req, res, hook);
     qnabot.log(`specialty botResp: ${JSON.stringify(botResp, null, 2)}`);
+    if (botResp._blocked) {
+        const resp = endUseOfSpecialtyBot(req, res, '');
+        resp.res = await translate_res(resp.req, resp.res);
+        return resp;
+    }
     if (botResp.message || _.get(botResp, 'dialogState', '') === 'ReadyForFulfillment') {
         let lexBotIsFulfilled;
         ({ res, lexBotIsFulfilled } = processBotRespMessage(botResp, req, res, _preferredResponseType));

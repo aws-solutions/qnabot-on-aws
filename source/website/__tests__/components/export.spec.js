@@ -2,18 +2,19 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { vi, describe, test, expect, beforeEach } from 'vitest';
 import exportModule from '../../js/components/export.vue';
 import { shallowMount } from '@vue/test-utils'
 
 describe('export component', () => {
     beforeEach(() => {
-        jest.resetAllMocks();
-        jest.spyOn(console, "log").mockImplementation(jest.fn());
+        vi.resetAllMocks();
+        vi.spyOn(console, "log").mockImplementation(vi.fn());
     });
 
     test('should mount', async () => {
         const store = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
         };
         const exportsJobs = { jobs: ['job1'] };
 
@@ -34,7 +35,7 @@ describe('export component', () => {
 
     test('poll once more', () => {
         const store = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
         };
         const exportsJobs = { jobs: ['job1'] };
 

@@ -3,6 +3,6 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const Vue = require('vue');
+import { createApp } from 'vue';
 
-export const EventBus = Vue.createApp();
+export const EventBus = createApp({});

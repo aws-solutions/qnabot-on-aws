@@ -3,14 +3,14 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const axios = require('axios');
-const jwt = require('jsonwebtoken');
-const _ = require('lodash');
-require('vue');
-const query = require('query-string');
-const { fromCognitoIdentityPool } = require('@aws-sdk/credential-providers');
-const { CognitoIdentityProviderClient, AdminUserGlobalSignOutCommand } = require('@aws-sdk/client-cognito-identity-provider');
-const util = require('../../../capability/util');
+import axios from 'axios';
+import jwt from 'jsonwebtoken';
+import _ from 'lodash';
+import 'vue';
+import query from 'query-string';
+import {  fromCognitoIdentityPool  } from '@aws-sdk/credential-providers';
+import {  CognitoIdentityProviderClient, AdminUserGlobalSignOutCommand  } from '@aws-sdk/client-cognito-identity-provider';
+import util from '../../../capability/util';
 
 const provideCredentials = async (context) => {
     const region = context.rootState.info.region;
@@ -77,6 +77,15 @@ const login = async (context) => {
             context.state.token = id_token;
         } else {
             const { code } = query.parse(window.location.search);
+            
+            // If no code parameter, redirect to login
+            if (!code) {
+                const loginUrl = _.get(context.rootState, 'info._links.DesignerLogin.href');
+                console.log('No auth code found, redirecting to login:', loginUrl);
+                window.location.href = loginUrl;
+                return; // Stop execution
+            }
+            
             token = jwt.decode(await getTokens(context, code));
         }
 
@@ -192,4 +201,4 @@ const refreshTokens = async (context) => {
     }
 };
 
-module.exports = { refreshTokens, getCredentials, logout, login };
+export default { refreshTokens, getCredentials, logout, login };

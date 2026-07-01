@@ -13,6 +13,9 @@ jest.mock('../../../lib/middleware/lexRouter');
 jest.mock('../../../lib/middleware/util');
 
 describe('when calling query function', () => {
+    beforeEach(() => {
+        util.isSameAccountArn.mockReturnValue(true);
+    });
     afterEach(() => {
         jest.clearAllMocks();
     });
@@ -68,18 +71,6 @@ describe('when calling query function', () => {
         expect(response).toEqual(queryFixtures.createMockEsQueryResponse());
     });
 
-    test('verify response when calling specialtyLambda & switchToNewBot evaluates to true ', async () => {
-        lexRouter.elicitResponse.mockReturnValue(queryFixtures.createMockRoutingResponse("elicitResponse"));
-        const mockRequest = queryFixtures.createRequestObject("What is QnABot", "specialtyLambda");
-        mockRequest.session.specialtyLambda = "mock_query_lambda_arn_switch_bot_test";
-        const response = await query(mockRequest, queryFixtures.createResponseObject());
-        expect(response.res.session.botName).not.toBeDefined();
-        const expectedResponse = queryFixtures.createMockEsQueryResponse();
-        expectedResponse.res.result.qid = "specialty.001";
-        delete expectedResponse.res.session.botName;
-        expect(response).toEqual(expectedResponse);
-    });
-
     test('verify response when calling queryLambda', async () => {
         let mockReturnResponse = queryFixtures.createMockRoutingResponse("elicitResponse", "");
         util.invokeLambda.mockReturnValue(mockReturnResponse);
@@ -103,38 +94,83 @@ describe('when calling query function', () => {
         expect(response).toEqual(expectedResponse);
     });
 
-    test('verify response when calling specialtyLambda', async () => {
-        util.invokeLambda.mockReturnValue(queryFixtures.createMockRoutingResponse("specialtyBot", ""));
-        const response = await query(queryFixtures.createRequestObject("What is QnABot", "specialtyLambda"), queryFixtures.createResponseObject());
-        const expectedResponse = queryFixtures.createMockRoutingResponse("specialtyBot", "");
-        expectedResponse.res.session.qnabotcontext.specialtyBot = "mock_specialty_bot";
-        expectedResponse.res.session.qnabotcontext.specialtyBotName = "mock_specialty_bot_name";
-        expect(util.invokeLambda).toHaveBeenCalled();
-        expect(response).toEqual(expectedResponse);
+    test('verify cross-account queryLambda is blocked and falls through to esquery', async () => {
+        util.isSameAccountArn.mockReturnValue(false);
+        const mockRequest = queryFixtures.createRequestObject("What is QnABot", "queryLambda");
+        mockRequest.session.queryLambda = "arn:aws:lambda:us-east-1:444455556666:function:qna-exfil";
+        const response = await query(mockRequest, queryFixtures.createResponseObject());
+        expect(util.invokeLambda).not.toHaveBeenCalled();
+        expect(response).toEqual(queryFixtures.createMockEsQueryResponse());
     });
 
-    test('verify response when calling query response contains specialty_bot_start_up_text', async () => {
-        let mockReturnResponse = queryFixtures.createMockRoutingResponse("specialtyBot", "");
-        const specialityBotResponse = queryFixtures.createMockRoutingResponse("specialtyBot");
-        specialtyBotRouter.routeRequest.mockReturnValue(specialityBotResponse);
-        mockReturnResponse.res.result.botRouting.specialty_bot_start_up_text = "mock_specialty_bot_start_up_text";
-        util.invokeLambda.mockReturnValue(mockReturnResponse);
-        let response = await query(queryFixtures.createRequestObject("What is QnABot", "specialtyLambda"), queryFixtures.createResponseObject());
-        expect(response).toEqual(specialityBotResponse);
-        expect(util.invokeLambda).toHaveBeenCalled();
-        expect(specialtyBotRouter.routeRequest).toHaveBeenCalled();
+    test('verify same-account queryLambda ARN is allowed', async () => {
+        const mockRequest = queryFixtures.createRequestObject("What is QnABot", "queryLambda");
+        mockRequest.session.queryLambda = "arn:aws:lambda:us-east-1:111122223333:function:qna-quiz";
+        util.invokeLambda.mockReturnValue(queryFixtures.createMockRoutingResponse("elicitResponse", ""));
+        const response = await query(mockRequest, queryFixtures.createResponseObject());
+        expect(util.invokeLambda).toHaveBeenCalledWith(expect.objectContaining({ FunctionName: "arn:aws:lambda:us-east-1:111122223333:function:qna-quiz" }));
+    });
 
-        mockReturnResponse = queryFixtures.createMockRoutingResponse("specialtyBot", "");
-        mockReturnResponse.res.result.botRouting.specialty_bot_start_up_text = "${utterance}";
-        util.invokeLambda.mockReturnValue(mockReturnResponse);
-        response = await query(queryFixtures.createRequestObject("What is QnABot", "specialtyLambda"), queryFixtures.createResponseObject());
-        expect(response).toEqual(specialityBotResponse);
-        expect(util.invokeLambda).toHaveBeenCalled();
-        expect(specialtyBotRouter.routeRequest).toHaveBeenCalled();
+    test('verify bare function name queryLambda (no ARN prefix) is allowed', async () => {
+        const mockRequest = queryFixtures.createRequestObject("What is QnABot", "queryLambda");
+        mockRequest.session.queryLambda = "qna-quiz-function";
+        util.invokeLambda.mockReturnValue(queryFixtures.createMockRoutingResponse("elicitResponse", ""));
+        const response = await query(mockRequest, queryFixtures.createResponseObject());
+        expect(util.invokeLambda).toHaveBeenCalledWith(expect.objectContaining({ FunctionName: "qna-quiz-function" }));
+    });
+
+    test('verify malformed ARN (starts with arn: but invalid format) is blocked', async () => {
+        util.isSameAccountArn.mockReturnValue(false);
+        const mockRequest = queryFixtures.createRequestObject("What is QnABot", "queryLambda");
+        mockRequest.session.queryLambda = "arn:malformed-not-a-real-arn";
+        const response = await query(mockRequest, queryFixtures.createResponseObject());
+        expect(util.invokeLambda).not.toHaveBeenCalled();
+        expect(response).toEqual(queryFixtures.createMockEsQueryResponse());
     });
 
     test('verify response when default esquery method is used', async () => {
         const response = await query(queryFixtures.createRequestObject("What is QnABot"), queryFixtures.createResponseObject());
         expect(response).toEqual(queryFixtures.createMockEsQueryResponse());
+    });
+
+    test('verify specialtybot routing sets session context when botRouting result present', async () => {
+        specialtyBotRouter.routeRequest.mockReturnValue(queryFixtures.createMockRoutingResponse('specialtyBot'));
+        const mockRequest = queryFixtures.createRequestObject('What is QnABot');
+        mockRequest.session._mockBotRouting = {
+            specialty_bot: 'mock_lambda::arn:aws:lambda:us-east-1:111122223333:function:mock-bot',
+            specialty_bot_name: 'mock_bot_name',
+        };
+        const response = await query(mockRequest, queryFixtures.createResponseObject());
+        expect(response?.res?.session?.qnabotcontext?.specialtyBot).toBeDefined();
+    });
+
+    test('verify specialtybot start_up_text sets req.question to utterance when ${utterance}', async () => {
+        specialtyBotRouter.routeRequest.mockReturnValue(queryFixtures.createMockRoutingResponse('specialtyBot'));
+        const mockRequest = queryFixtures.createRequestObject('What is QnABot');
+        mockRequest.session._mockBotRouting = {
+            specialty_bot: 'mock_lambda::arn:aws:lambda:us-east-1:111122223333:function:mock-bot',
+            specialty_bot_name: 'mock_bot_name',
+            specialty_bot_start_up_text: '${utterance}',
+        };
+        await query(mockRequest, queryFixtures.createResponseObject());
+        expect(specialtyBotRouter.routeRequest).toHaveBeenCalled();
+        expect(specialtyBotRouter.routeRequest.mock.calls[0][0]).toEqual(
+            expect.objectContaining({ question: 'What is QnABot' })
+        );
+    });
+
+    test('verify specialtybot start_up_text sets req.question to literal text', async () => {
+        specialtyBotRouter.routeRequest.mockReturnValue(queryFixtures.createMockRoutingResponse('specialtyBot'));
+        const mockRequest = queryFixtures.createRequestObject('What is QnABot');
+        mockRequest.session._mockBotRouting = {
+            specialty_bot: 'mock_lambda::arn:aws:lambda:us-east-1:111122223333:function:mock-bot',
+            specialty_bot_name: 'mock_bot_name',
+            specialty_bot_start_up_text: 'Welcome to the bot!',
+        };
+        await query(mockRequest, queryFixtures.createResponseObject());
+        expect(specialtyBotRouter.routeRequest).toHaveBeenCalled();
+        expect(specialtyBotRouter.routeRequest.mock.calls[0][0]).toEqual(
+            expect.objectContaining({ question: 'Welcome to the bot!' })
+        );
     });
 });

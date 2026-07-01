@@ -65,11 +65,10 @@ v-container(fluid style="height: 80vh !important")
 </template>
 
 <script>
-
-require('vuex');
-const { saveAs } = require('file-saver');
-const { reactive } = require('vue');
-const modal = require('./modal.vue').default;
+import { saveAs } from 'file-saver';
+import { reactive } from 'vue';
+import 'vuex';
+import modal from './modal.vue';
 
 export default {
     components: {
